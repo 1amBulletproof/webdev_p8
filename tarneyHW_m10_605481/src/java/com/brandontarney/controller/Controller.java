@@ -60,7 +60,6 @@ public class Controller extends HttpServlet {
             dispatcher.forward(request, response);
         } else {
             String queryString = request.getQueryString();
-            System.out.println(queryString);
             int partySize = Integer.parseInt(request.getParameter(PARTY_SIZE));
             int duration = Integer.parseInt(request.getParameter(DURATION));
 
@@ -75,9 +74,16 @@ public class Controller extends HttpServlet {
                 //STORE RATE & SUCCESS & PARTY_SIZE in HikeInfo BEAN/MODEL
                 info.setRate(rate);
                 info.setPartySize(partySize);
-                //SELECT THE CORRECT JSP (QUERY IF MISSING VALUES, RESULT WITH VALID RATE< ERROR OTHERWISE)
-                RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/result.jsp");
-                dispatcher.forward(request, response);
+
+                if (rate.isValidDates()) {
+                    //SELECT THE CORRECT JSP (QUERY IF MISSING VALUES, RESULT WITH VALID RATE< ERROR OTHERWISE)
+                    RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/result.jsp");
+                    dispatcher.forward(request, response);
+                } else {
+                    RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/error.jsp");
+                    dispatcher.forward(request, response);
+                    System.out.println(rate.getDetails());
+                }
 
             } catch (BadQueryStringException exception) {
                 info.setDetails(exception.getMessage());
@@ -108,12 +114,7 @@ public class Controller extends HttpServlet {
         rate.setBeginDate(startDate);
         rate.setDuration(duration);
 
-        LocalDate today = LocalDate.now();
-        int todayDay = today.getDayOfMonth();
-        int todayMonth = today.getMonthValue();
-        int todayYear = today.getYear();
 
-        BookingDay todayBookingDay = new BookingDay(todayYear, todayMonth, todayDay);
 
         return rate;
     }

@@ -31,14 +31,14 @@
     <body>
         <div id="page_wrapper">
             <header>
-                <h1 id="top_header">Beartooth Hiking Company QUERY</h1>
+                <h1 id="top_header">Beartooth Hiking Company</h1>
                 <p id="slogan">Alaska's Lamest Hiking Company</p>
                 <nav>
             </header>
             <section id="form" class="table">
                 <h2 id="form_header">Choose Your Hike</h2>
-                <form action="http://localhost:8084/tarneyHW_m10_605481/Controller" method=GET onSubmit=" return validatePartySize(1, 10)"> 
-               <!-- <form action="http://web6.jhuep.com:80/tarneyHW_m8_605481/TarneyServlet" method=GET onSubmit=" return validatePartySize(1, 10)"> -->
+                <!-- <form action="http://localhost:8084/tarneyHW_m10_605481/Controller" method=GET onSubmit=" return validatePartySize(1, 10)"> -->
+                <form action="http://web6.jhuep.com:80/tarneyHW_m10_605481/TarneyServlet" method=GET onSubmit=" return validatePartySize(1, 10)"> 
                     <p class="excited_msg">Hike</p>
                     <select class="bigger_text" name="hike" size="1">
                         <option value="hellroaring">Hellroaring Plateau</option>

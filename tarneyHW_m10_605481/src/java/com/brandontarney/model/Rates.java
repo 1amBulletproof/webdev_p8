@@ -2,6 +2,7 @@ package com.brandontarney.model;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -27,7 +28,7 @@ public class Rates {
             return value;
         }
     }
-    
+
     private HIKE hike;
     // flag to indicate total rate and day types need to be recalculated
     private boolean synched = false;
@@ -40,6 +41,8 @@ public class Rates {
     private BookingDay beginDate = null;
     // end of trip
     private BookingDay endDate = null;
+    //valid duration Used
+    private boolean validDuration = false;
     // Format the date to something readable
     private final static DateFormat FORMAT = DateFormat.getDateInstance();
     // cached number of weekend days
@@ -57,9 +60,9 @@ public class Rates {
 
     private String details = "none";
     private int[] validDurations = null;
-    
+
     public Rates() {
-        
+
     }
 
     public Rates(HIKE hike) {
@@ -152,7 +155,10 @@ public class Rates {
      * @return true if both days exist and the begin date is before the end date
      */
     public boolean isValidDates() {
-        if (beginDate == null
+        if (!this.validDuration) {
+            details = "invalid duration for this hike (see table below)";
+            return false;
+        } else if (beginDate == null
                 || endDate == null) {
             details = "One of the dates was not defined";
             return false;
@@ -162,25 +168,33 @@ public class Rates {
         } else if (beginDate.equals(endDate)) {
             details = "The begin and end date must not be the same date";
             return false;
-        } else if (beginDate.isValidDate() && endDate.isValidDate()) {
-            if (!beginDate.after(endDate)) {
-                if ((!beginDate.before(seasonStartMonth, seasonStartDay))
-                        && (!endDate.after(seasonEndMonth, seasonEndDay))) {
-                    details = "valid dates";
-                    return true;
-                } else {
-                    details = "begin or end date was out of season";
-                    return false;
-                }
-            } else {
-                details = "end date was before begin date";
-                return false;
-            }
-        } else {
-            details = "One of the dates was not a valid day";
+        } else if (!beginDate.isValidDate() || !endDate.isValidDate()) {
+            details = "one of the dates was invalid";
             return false;
+        } else if (beginDate.after(endDate)) {
+            details = "beginning date was before end date";
+            return false;
+        } else if ((beginDate.before(seasonStartMonth, seasonStartDay))
+                || (endDate.after(seasonEndMonth, seasonEndDay))) {
+            details = "begin or end date was out of season";
+            return false;
+        } else if (!beginDate.after(this.getToday())) {
+            details = "begin date is prior to today's date";
+            return false;
+        } else {
+            details = "valid dates";
+            return true;
         }
+    }
 
+    private BookingDay getToday() {
+        LocalDate today = LocalDate.now();
+        int todayDay = today.getDayOfMonth();
+        int todayMonth = today.getMonthValue();
+        int todayYear = today.getYear();
+
+        BookingDay todayBookingDay = new BookingDay(todayYear, todayMonth, todayDay);
+        return todayBookingDay;
     }
 
     /**
@@ -317,17 +331,14 @@ public class Rates {
      *
      * @param int the duration of the hike
      */
-    public boolean setDuration(int days) {
-        boolean valid = false;
+    public void setDuration(int days) {
         for (int d : validDurations) {
             if (days == d) {
-                valid = true;
+                this.validDuration = true;
                 break;
             }
         }
-        if (!valid) {
-            return false;
-        } else {
+        if (this.validDuration) {
             // first a quick check to see if this is a valid
             GregorianCalendar day = beginDate.getDate();
             day.add(Calendar.DAY_OF_MONTH, days - 1);
@@ -335,7 +346,7 @@ public class Rates {
                     day.get(Calendar.MONTH) + 1,
                     day.get(Calendar.DAY_OF_MONTH));
             synched = false;
-            return true;
+
         }
     }
 
@@ -370,8 +381,8 @@ public class Rates {
         Rates rates = new Rates(HIKE.BEATEN);
 
         rates.setBeginDate(startDay);
-        boolean success = rates.setDuration(7);
-        System.out.println("duration was " + (success ? "good" : "bad"));
+        rates.setDuration(7);
+        //System.out.println("duration was " + (success ? "good" : "bad"));
         System.out.println("valid Dates = " + rates.isValidDates());
         if (rates.isValidDates()) {
             System.out.println("Cost of trip = " + rates.getCost());

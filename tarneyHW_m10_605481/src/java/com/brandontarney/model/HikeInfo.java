@@ -23,17 +23,17 @@ public class HikeInfo {
         this.rate = newRate;
     }
 
-    public Rates getRate() throws BadRateException{
+    public Rates getRate() throws BadRateException {
         if (this.rate == null) {
             throw new BadRateException("Rate not set");
-         }
+        }
         return this.rate;
     }
-    
+
     public void setPartySize(int size) {
         this.partySize = size;
     }
-    
+
     public int getPartySzie() {
         return this.partySize;
     }
@@ -45,42 +45,17 @@ public class HikeInfo {
     public boolean getSuccess() {
         return this.success;
     }
-    
+
     public void setDetails(String newDetails) {
         this.details = newDetails;
     }
-    
+
     public String getDetails() {
-        return this.details;
+        if (this.rate != null && this.details.equals("")) {
+            return this.rate.getDetails();
+        } else {
+            return this.details;
+        }
     }
-
-    /*
-    public void setDuration(int newDuration) {
-        this.duration = newDuration;
-    }
-
-    public int getDuration() {
-        return this.duration;
-    }
-
-    public void setMonth(int newMonth) {
-        this.month = newMonth;
-    }
-
-    public int getMonth() {
-        return this.month;
-    }
-
-    public void setDay() {
-    
-
-    public void setDescription(String newDescription) {
-        this.description = newDescription;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-     */
 }
+
